@@ -51,7 +51,7 @@ In this stage:
 - I tried to make the functions as abstract as possible, for example the find_match function and _scalar_match function are used to find the match between the search key and the search value in the entry. In this way we can parse multile type of filters in case of change of schema or database.
 - First priority is given to the mandatory filters (not passed if is not matched), then to the scoring filters (1 point for each matched filter) and then to the embedding similarity scoring (1.5x for core_offerings and 1x for description, because of relevance).
 
-`Formula: QueryFilterScore = (MandatoryFilters * infinite) + sum[MatchedScoringFilters(1 point)] + (DescriptionEmbeddingScore * 1) + (CoreOfferingsEmbeddingScore * 1.5)`
+`Formula: QueryFilterScore = MandatoryFilters(0 or 1) * (sum[MatchedScoringFilters(1 point)] + (DescriptionEmbeddingScore * 1) + (CoreOfferingsEmbeddingScore * 1.5))`
 
 ### 3. LLM Refinement
 Top results are reranked using an LLM to confirm relevance. This is used to prevent some miss-rankings caused by the query processing stage. For example if a company has a very high embedding similarity score but does not match the query filters, the LLM will rerank it lower.
