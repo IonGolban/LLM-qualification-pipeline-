@@ -1,0 +1,31 @@
+# Environments
+.env
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Project specific generated files (optional, depending on your workflow)
+# data/results.jsonl
+# data/filters_example.json
+
+# Caches
+.pytest_cache/
+.mypy_cache/
+
+# OS specific
+.DS_Store
+Thumbs.db

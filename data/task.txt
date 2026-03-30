@@ -1,0 +1,293 @@
+Task
+
+Your mission is to build a ranking and qualification system that determines whether a company truly matches a user’s request.
+
+Imagine a user asks: “Find logistics companies in Germany.”
+
+A search system retrieves hundreds of companies that might be relevant. But search results are noisy. Among them you might find:
+
+    A freight forwarding company in Hamburg (perfect match)
+    A German software company that builds logistics management tools (debatable)
+    A Polish company operating a warehouse near the German border (probably not)
+
+Search retrieves candidates, but something still needs to decide which companies actually match the user’s intent.
+
+A naive approach would be to send every candidate company to a large language model and ask: “Does this company match the query?”
+
+This works surprisingly well, but it has serious problems:
+
+    Expensive — qualifying hundreds of companies per query quickly becomes costly.
+    Slow — sequential API calls can take tens of seconds.
+    Inconsistent — borderline cases may produce different answers across runs.
+    Overkill — simple queries receive the same expensive treatment as complex reasoning tasks.
+
+Your challenge is to design a smarter qualification system that balances:
+
+    Accuracy
+    Speed
+    Cost
+    Scalability
+
+The strongest solutions will combine multiple techniques and apply them intelligently.
+ 
+1. Data
+
+You will receive a dataset containing a collection of company profiles. Each company represents a potential candidate that may or may not satisfy a given query.
+
+Each company may include some or all of the following fields:
+
+    website – The company’s primary website domain.
+    operational_name – The commonly used name of the company.
+    year_founded – The year the company was established.
+    address – The company’s primary location
+    employee_count – Estimated number of employees.
+    revenue – Estimated annual revenue in USD.
+    primary_naics – The company’s main NAICS industry classification.
+    secondary_naics – Additional NAICS industry classifications where applicable.
+    description – A textual description of the company’s activities, products, or services.
+    business_model – The primary business model (e.g., B2B, B2C, marketplace, SaaS, etc.).
+    target_markets – Industries or customer segments the company serves.
+    core_offerings – Key products or services provided by the company.
+    is_public – Indicates whether the company is publicly traded.
+
+Example company record:
+{
+"operational_name": "Meridian Logistics GmbH",
+"website": "meridian-logistics.de",
+"year_founded": 2003,
+"address": "Munich, Germany",
+"employee_count": 342,
+"revenue": 48000000,
+"primary_naics": {"code": "488510", "label": "Freight Transportation Arrangement"},
+"secondary_naics": [{"code": "493110", "label": "General Warehousing and Storage"}],
+"description": "Full-service freight forwarding and supply chain management company offering customs brokerage, warehousing, and transportation solutions across Europe.",
+"business_model": ["B2B", "Service Provider"],
+"core_offerings": ["freight forwarding", "customs brokerage", "warehousing"],
+"target_markets": ["automotive", "manufacturing"],
+"is_public": false
+}
+
+Important: not every company contains every field.
+Missing data is common in real-world company datasets, so your solution should remain effective even when some information is unavailable.
+ 
+2. Objective
+
+Build a system that:
+
+    receives a user query
+    has access to the companies database
+
+and determines which companies truly match the query.
+
+Your solution should return a ranked or filtered list of companies that best satisfy the user’s intent.
+
+The goal is not simply to find companies that are *similar* to the query — but companies that meaningfully satisfy the constraints implied by it.
+ 
+3. Queries
+
+Your system will be tested on 12 queries of varying complexity.
+
+Some queries are highly structured and map directly to specific fields.
+
+Example:
+
+    “Public software companies with more than 1,000 employees.”
+
+Others require interpretation and reasoning.
+
+Example:
+
+    “Fast-growing fintech companies competing with traditional banks in Europe.”
+
+Some queries may involve:
+
+    supply chains
+    business relationships
+    inferred industry roles
+    vague or subjective criteria
+
+Your system should attempt to handle both structured and judgment-heavy queries.
+
+ 
+Example Queries
+
+    Logistic companies in Romania
+
+    Public software companies with more than 1,000 employees.
+
+    Food and beverage manufacturers in France
+
+    Companies that could supply packaging materials for a direct-to-consumer cosmetics brand
+
+    Construction companies in the United States with revenue over $50 million
+
+    Pharmaceutical companies in Switzerland
+
+    B2B SaaS companies providing HR solutions in Europe
+
+    Clean energy startups founded after 2018 with fewer than 200 employees
+
+    Fast-growing fintech companies competing with traditional banks in Europe.
+
+    E-commerce companies using Shopify or similar platforms
+
+    Renewable energy equipment manufacturers in Scandinavia
+
+    Companies that manufacture or supply critical components for electric vehicle battery production
+
+Look carefully at the differences between these queries.
+
+Some are almost entirely structured filters.
+
+Others require interpreting the role a company plays within a broader ecosystem.
+
+Such a problem requires a flexible system that can adapt to the complexity of the query.
+
+ 
+4. Baselines
+
+You may find the following baseline strategies tempting. Each works partially, but each has significant limitations.
+
+BASELINE A — LLM Per Company
+
+Send each company individually to an LLM and ask: “Does this company match the query?”
+
+Pros:
+
+    strong semantic understanding
+    decent accuracy
+
+Cons:
+
+    expensive
+    slow
+    inconsistent
+    scales poorly
+
+BASELINE B — Embedding Similarity
+
+Embed the query and each company profile and rank by cosine similarity.
+
+Pros:
+
+    cheap
+    fast
+
+Cons:
+
+    poor intent understanding
+    similarity ≠ relevance
+
+Example failure:
+
+Query: “Companies supplying packaging for cosmetics brands”
+
+Embedding search often ranks cosmetics companies instead of packaging suppliers.
+
+ 
+Your Goal
+
+Design a system that combines the strengths of these approaches while avoiding their weaknesses.
+
+Your solution should aim to be:
+
+    More accurate than naive similarity search
+    Faster and cheaper than sending every company to an LLM
+    Scalable to large datasets
+
+ 
+Expected Deliverables
+
+    Implementation
+
+    Provide a working solution that processes the set of queries
+
+    Your solution should produce qualified companies for each query.
+
+    You are free to design the architecture however you see fit.
+    Code
+    Submit the code implementing your approach.
+
+    Your code should demonstrate:
+        clear structure
+        modular design
+        scalability considerations
+
+
+    Organise your submission similar to the following:
+
+    your-submission/
+    ├── solution.py
+    ├── WRITEUP.md
+    ├── requirements.txt
+    └── any supporting files
+    Writeup
+
+Alongside your implementation, submit a  WRITEUP.md explaining your solution.
+
+We care as much about the way you think as the final results.
+
+Your writeup should address the following:
+3.1 Approach
+
+Describe your system architecture.
+
+    What components does it include?
+    How do they interact?
+    Why did you choose this design?
+
+3.2 Tradeoffs
+
+What did you optimize for?
+
+Examples:
+
+    speed
+    cost
+    accuracy
+    simplicity
+    robustness
+
+What trade-offs did you intentionally make?
+3.3 Error Analysis
+
+Where does your system struggle?
+
+Show concrete examples of companies it misclassifies and explain why.
+3.4 Scaling
+
+If the system needed to handle 100,000 companies per query instead of 500, what would you change?
+3.5 Failure Modes
+
+When might your system produce confident but incorrect results?
+
+What would you monitor in production to detect these failures?
+ 
+Critical Thinking
+
+The strongest submissions show deep reflection about the problem and solution.
+
+Ask yourself questions such as:
+
+    Where does my system work extremely well?
+    Where does it fail?
+    What assumptions did I make?
+    How robust is the system to missing data?
+    How well would this scale to millions of companies?
+    What improvements would I prioritise next?
+    What signals does the system rely on most heavily?
+    When might those signals be misleading?
+
+Understanding the limits of your approach is as important as demonstrating its strengths.
+ 
+Resources
+
+If you’re ready to begin, start with the following: companies.jsonl
+
+import pandas as pd
+df = pd.read_json("data/companies.jsonl", lines=True)
+
+We’re excited to see the solutions you come up with.
+
+Focus on building a system that is thoughtful, scalable, and well-reasoned.
+
